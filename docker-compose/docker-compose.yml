@@ -1,0 +1,73 @@
+version: '2.3'
+services:
+  redis:
+    image: redis:6.2.6
+    container_name: redis
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    volumes:
+      - ./data/redis/conf:/data/conf
+      - ./data/redis/31010:/data/31010
+      - ./data/redis/logs:/data/logs
+      - /etc/hosts:/etc/hosts:ro
+    networks:
+      - rulemanager
+    command: redis-server /data/conf/redis.conf
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    privileged: true
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+      - ./data/mysql/mysql-files:/var/lib/mysql-files
+      - /etc/hosts:/etc/hosts:ro
+    networks:
+      - rulemanager
+    env_file:
+      - ./data/mysql/config/env
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  rulemanager:
+    image: python:3.7_rule
+    container_name: rulemanager
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    volumes:
+      - ./data/rulemanager/:/data/
+      - /etc/hosts:/etc/hosts:ro
+    networks:
+      - rulemanager
+    ports:
+      - "8088:8088"
+    env_file:
+      - ./data/rulemanager/config/env
+    working_dir: /data/server/rulemanager/
+    links:
+      - redis:redisdb
+      - mysql:mysqldb
+    depends_on:
+      - redis
+      - mysql
+    command: bash scripts/docker-entrypoint.sh
+    #command: sleep 10d
+
+
+networks:
+  rulemanager:
+    external: false

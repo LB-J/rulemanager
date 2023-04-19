@@ -1,0 +1,41 @@
+groups:
+- name: 硬件监控
+  rules:
+  - alert: cpu 使用率大于50%
+    annotations:
+      description: cpu 使用率大于50%当前值为{{ $value }}
+    expr: cpu5musedrate > 50
+    for: 5m
+    labels:
+      rule_id: 13
+  - alert: 内存使用率大于90%
+    annotations:
+      description: '{{ $labels.instance }} 内存使用率大于90%'
+    expr: sort(avg by (hostname,instance,job) ((1- avg_over_time(node_memory_MemAvailable_bytes[5m])/avg_over_time(node_memory_MemTotal_bytes[5m])
+      ) * 100 > 90))
+    for: 5m
+    labels:
+      rule_id: 14
+  - alert: /export 磁盘空间小于100G
+    annotations:
+      description: '{{ $labels.instance }}  磁盘空间小于100G'
+    expr: sum(node_filesystem_avail_bytes{mountpoint =  "/export"}) by (hostname,
+      mountpoint) < 100000000000
+    for: 5m
+    labels:
+      rule_id: 16
+  - alert: / 磁盘空间小于20G
+    annotations:
+      description: '{{ $labels.instance }}根磁盘空间小于20G'
+    expr: sum(node_filesystem_avail_bytes{mountpoint =  "/"}) by (hostname, mountpoint,instance)
+      < 20000000000
+    for: 5m
+    labels:
+      rule_id: 17
+  - alert: zk watch > 3000
+    annotations:
+      description: '{{ $labels.instance }}  zk watch > 3000'
+    expr: zookeeper_inmemorydatatree_watchcount > 3000
+    for: 5m
+    labels:
+      rule_id: 18

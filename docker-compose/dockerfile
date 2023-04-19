@@ -1,0 +1,5 @@
+FROM docker.io/python:3.7
+ENV TZ Asia/Shanghai
+#RUN  pip install -r /root/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN  pip install -i https://pypi.tuna.tsinghua.edu.cn/simple   Django==3.1.7 dj-rest-auth  django-cors-headers  django-cors-middleware  django-crispy-forms  django-db-connection-pool  django-filter   django-redis  django-rest-auth  django-rest-framework-social-oauth2  django-stubs  django-templated-mail  djangorestframework  djangorestframework-bulk  djangorestframework-jwt  djangorestframework-simplejwt  djangorestframework-stubs mysqlclient  apscheduler PyMySQL PyYAML djoser
+RUN rm -rf /root/.cache/pip/

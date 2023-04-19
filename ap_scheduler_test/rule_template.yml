@@ -1,0 +1,18 @@
+groups:
+- name: machine
+  rules:
+  - alert: memory usage > 90%
+    expr: sort(avg by (hostname,instance,job) ((1- avg_over_time(node_memory_MemAvailable_bytes[5m])/avg_over_time(node_memory_MemTotal_bytes[5m]) ) * 100 > 90))
+    for: 2m
+    labels:
+      alertid: 10
+    annotations:
+      summary: "Instance {{ $labels.instance }}"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} {{ $value }} has been down for more than 5 minutes."
+  - alert: memory usage > 90% test
+    expr: sort(avg by(hostname, instance, job) ((1 - avg_over_time(node_memory_MemAvailable_bytes{hostname='shiyu-zhili-slave02'}[5m]) / avg_over_time(node_memory_MemTotal_bytes{hostname='shiyu-zhili-slave02'}[5m])) * 100 > 90))
+    labels:
+      alertid: 12
+    annotations:
+      summary: "Instance {{ $labels.instance }}"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."

@@ -1,0 +1,23 @@
+"id": 13,
+"group_name": "硬件监控",
+"rules_users": [
+    {
+        "id": 12,
+        "username": "asher",
+        "rule": 13,
+        "alert_user": 7
+    }
+],
+"rules_groups": [],
+"name": "cpu 使用率大于50%",
+"rule": "cpu5musedrate > 50",
+"check_period": 5,
+"alert_period": 10,
+"labels": "",
+"description": "cpu 使用率大于50%当前值为{{ $value }}",
+"level": 2,
+"user": "asher",
+"remarks": "cpu 使用率告警",
+"create_time": "2021-04-26T09:34:37.760614Z",
+"update_time": "2021-04-26T12:51:00.297011Z",
+"group": 1
