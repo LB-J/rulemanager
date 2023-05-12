@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 
 
+# 告警用户分组
 class AlertReceivingGroup(models.Model):
     name = models.CharField(max_length=50, verbose_name="alert receiving group")
     remarks = models.CharField(max_length=200, verbose_name="group marks")
@@ -14,6 +15,7 @@ class AlertReceivingGroup(models.Model):
         ordering = ['id']
 
 
+# 告警分组关联用户
 class AlertGroupTUsers(models.Model):
     user = models.ForeignKey('auth.User', related_name="alert_user", on_delete=models.CASCADE)
     group = models.ForeignKey('AlertReceivingGroup', related_name="alert_user_group", on_delete=models.CASCADE)
@@ -22,6 +24,7 @@ class AlertGroupTUsers(models.Model):
         ordering = ['id']
 
 
+# 规则分组
 class RuleGroup(models.Model):
     name = models.CharField(max_length=30, verbose_name="rule group name")
     remarks = models.CharField(max_length=200, verbose_name="rule group remarks")
@@ -33,6 +36,7 @@ class RuleGroup(models.Model):
         ordering = ['id']
 
 
+# 规则分组和告警接收用户分组关联
 class RuleGroupTAlertGroup(models.Model):
     rule_group = models.ForeignKey('RuleGroup', related_name="alert_groups", on_delete=models.CASCADE)
     alert_group = models.ForeignKey('AlertReceivingGroup', related_name='alert_group_rule', on_delete=models.CASCADE)
@@ -41,6 +45,8 @@ class RuleGroupTAlertGroup(models.Model):
         ordering = ['id']
 
 
+# 规则分组和用户关联，未用到
+# 2023-05-12 弃用
 class RuleGroupTAlertUser(models.Model):
     rule_group = models.ForeignKey('RuleGroup', related_name="alert_users", on_delete=models.CASCADE)
     alert_user = models.ForeignKey('auth.User', related_name='alert_user_for_rule', on_delete=models.CASCADE)
@@ -49,6 +55,7 @@ class RuleGroupTAlertUser(models.Model):
         ordering = ['id']
 
 
+# 规则详表
 class Rules(models.Model):
     group = models.ForeignKey('RuleGroup', verbose_name="rule group", related_name="rules_group", on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name="rule name")
@@ -73,6 +80,8 @@ class Rules(models.Model):
         ordering = ['id']
 
 
+# 规则和告警用户分组关联
+# 2023-05-12 弃用
 class RulesTAlertGroup(models.Model):
     rule = models.ForeignKey('Rules', related_name="rules_groups", on_delete=models.CASCADE)
     alert_group = models.ForeignKey('AlertReceivingGroup', related_name='alert_group_rules', on_delete=models.CASCADE)
@@ -81,6 +90,7 @@ class RulesTAlertGroup(models.Model):
         ordering = ['id']
 
 
+# 规则和告警用户关联
 class RulesTAlertUsers(models.Model):
     rule = models.ForeignKey('Rules', related_name="rules_users", on_delete=models.CASCADE)
     alert_user = models.ForeignKey('auth.User', related_name='alert_user_for_rules', on_delete=models.CASCADE)

@@ -2,7 +2,7 @@ version: '2.3'
 services:
   redis:
     image: redis:6.2.6
-    container_name: redis
+    container_name: rule_redis
     restart: always
     cap_drop:
       - ALL
@@ -20,7 +20,7 @@ services:
     command: redis-server /data/conf/redis.conf
   mysql:
     image: mysql:5.7
-    container_name: mysql
+    container_name: rule_mysql
     restart: always
     cap_drop:
       - ALL
@@ -39,7 +39,7 @@ services:
       - ./data/mysql/config/env
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
   rulemanager:
-    image: python:3.7_rule
+    image: asherjiang/python:20230426
     container_name: rulemanager
     restart: always
     cap_drop:

@@ -29,31 +29,32 @@ class RuleGroupTAlertGroupSerializer(BulkSerializerMixin, serializers.ModelSeria
         fields = "__all__"
 
 
-class RuleGroupTAlertUserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    username = serializers.ReadOnlyField(source='alert_user.username')
-
-    class Meta:
-        model = RuleGroupTAlertUser
-        list_serializer_class = BulkListSerializer
-        fields = "__all__"
+# class RuleGroupTAlertUserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+#     username = serializers.ReadOnlyField(source='alert_user.username')
+#
+#     class Meta:
+#         model = RuleGroupTAlertUser
+#         list_serializer_class = BulkListSerializer
+#         fields = "__all__"
 
 
 class RuleGroupSerializer(serializers.ModelSerializer):
     alert_groups = RuleGroupTAlertGroupSerializer(many=True, read_only=True)
-    alert_users = RuleGroupTAlertUserSerializer(many=True, read_only=True)
+    # alert_users = RuleGroupTAlertUserSerializer(many=True, read_only=True)
 
     class Meta:
         model = RuleGroup
         fields = "__all__"
 
 
-class RulesTAlertGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    group_name = serializers.ReadOnlyField(source='alert_group.name')
-
-    class Meta:
-        model = RulesTAlertGroup
-        list_serializer_class = BulkListSerializer
-        fields = "__all__"
+# 2023-05-12 弃用
+# class RulesTAlertGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+#     group_name = serializers.ReadOnlyField(source='alert_group.name')
+#
+#     class Meta:
+#         model = RulesTAlertGroup
+#         list_serializer_class = BulkListSerializer
+#         fields = "__all__"
 
 
 class RulesTAlertUsersSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -70,7 +71,7 @@ class RulesSerializer(serializers.ModelSerializer):
     # 告警接收用户
     rules_users = RulesTAlertUsersSerializer(many=True, read_only=True)
     # 告警接收用户组
-    rules_groups = RulesTAlertGroupSerializer(many=True, read_only=True)
+    # rules_groups = RulesTAlertGroupSerializer(many=True, read_only=True)
 
     class Meta:
         model = Rules

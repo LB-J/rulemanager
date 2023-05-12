@@ -79,15 +79,18 @@ class RuleGroupTAlertGroupFilter(django_filters.rest_framework.FilterSet):
         fields = "__all__"
 
 
-def add_rules_group(rule_group, alert_group):
-    all_rule = Rules.objects.filter(group=rule_group)
-    group_list = [RulesTAlertGroup(rule=i, alert_group_id=alert_group) for i in all_rule]
-    RulesTAlertGroup.objects.bulk_create(group_list)
+# 告警分组添加告警接收分组时，遍历规则，增加告警分组
+# 2023-05-12 删除方法
+# def add_rules_group(rule_group, alert_group):
+#     all_rule = Rules.objects.filter(group=rule_group)
+#     group_list = [RulesTAlertGroup(rule=i, alert_group_id=alert_group) for i in all_rule]
+#     RulesTAlertGroup.objects.bulk_create(group_list)
 
-
-def delete_rules_group(rule_group, alert_group):
-    all_rule = Rules.objects.filter(group=rule_group).values('id')
-    RulesTAlertGroup.objects.filter(rule_id__in=all_rule, alert_group_id=alert_group).delete()
+# 告警分组删除时，删除掉规则和告警分组之间的关联。
+# 2023-05-12 删除方法
+# def delete_rules_group(rule_group, alert_group):
+#     all_rule = Rules.objects.filter(group=rule_group).values('id')
+#     RulesTAlertGroup.objects.filter(rule_id__in=all_rule, alert_group_id=alert_group).delete()
 
 
 class RuleGroupTAlertGroupViewSet(BulkModelViewSet):
@@ -99,23 +102,24 @@ class RuleGroupTAlertGroupViewSet(BulkModelViewSet):
     filter_class = RuleGroupTAlertGroupFilter
     pagination_class = StandardResultsSetPagination
 
-    def perform_create(self, serializer):
-        s = serializer.save()
-        if type(s) is list:
-            for i in s:
-                add_rules_group(i.rule_group, i.alert_group)
-        else:
-            add_rules_group(s.rule_group, s.alert_group)
+# 2023-05-12 优化方法
+    # def perform_create(self, serializer):
+    #     s = serializer.save()
+    #     if type(s) is list:
+    #         for i in s:
+    #             add_rules_group(i.rule_group, i.alert_group)
+    #     else:
+    #         add_rules_group(s.rule_group, s.alert_group)
 
-    def perform_destroy(self, instance):
-        delete_rules_group(instance.rule_group, instance.alert_group)
-        instance.delete()
+    # def perform_destroy(self, instance):
+    #     delete_rules_group(instance.rule_group, instance.alert_group)
+    #     instance.delete()
 
 
-class RuleGroupTAlertUserFilter(django_filters.rest_framework.FilterSet):
-    class Meta:
-        model = RuleGroupTAlertUser
-        fields = "__all__"
+# class RuleGroupTAlertUserFilter(django_filters.rest_framework.FilterSet):
+#     class Meta:
+#         model = RuleGroupTAlertUser
+#         fields = "__all__"
 
 
 def add_rules_user(rule_group, alert_user):
@@ -129,27 +133,27 @@ def delete_rules_user(rule_group, alert_user):
     RulesTAlertUsers.objects.filter(rule_id__in=all_rule, alert_user=alert_user).delete()
 
 
-class RuleGroupTAlertUserViewSet(BulkModelViewSet):
-    authentication_classes = (SessionAuthentication,)
-    permission_classes = (AllowAny,)
-    queryset = RuleGroupTAlertUser.objects.all().order_by('-id')
-    serializer_class = RuleGroupTAlertUserSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filter_class = RuleGroupTAlertUserFilter
-    pagination_class = StandardResultsSetPagination
-
-    def perform_create(self, serializer):
-        s = serializer.save()
-        if type(s) is list:
-            for i in s:
-                add_rules_user(i.rule_group, i.alert_user)
-        else:
-            add_rules_user(s.rule_group, s.alert_user)
-
-    def perform_destroy(self, instance):
-        delete_rules_user(instance.rule_group, instance.alert_user)
-        instance.delete()
-
+# class RuleGroupTAlertUserViewSet(BulkModelViewSet):
+#     authentication_classes = (SessionAuthentication,)
+#     permission_classes = (AllowAny,)
+#     queryset = RuleGroupTAlertUser.objects.all().order_by('-id')
+#     serializer_class = RuleGroupTAlertUserSerializer
+#     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+#     filter_class = RuleGroupTAlertUserFilter
+#     pagination_class = StandardResultsSetPagination
+#
+#     def perform_create(self, serializer):
+#         s = serializer.save()
+#         if type(s) is list:
+#             for i in s:
+#                 add_rules_user(i.rule_group, i.alert_user)
+#         else:
+#             add_rules_user(s.rule_group, s.alert_user)
+#
+#     def perform_destroy(self, instance):
+#         delete_rules_user(instance.rule_group, instance.alert_user)
+#         instance.delete()
+#
 
 class RulesFilter(django_filters.rest_framework.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
@@ -159,13 +163,15 @@ class RulesFilter(django_filters.rest_framework.FilterSet):
         fields = "__all__"
 
 
-def add_rule_group(group, rule):
-    alert_group = RuleGroupTAlertGroup.objects.filter(rule_group_id=group).values('alert_group')
-    add_group = []
-    for i in alert_group:
-        add_group.append(RulesTAlertGroup(rule_id=rule, alert_group_id=i['alert_group']))
-    if len(add_group) > 0:
-        RulesTAlertGroup.objects.bulk_create(add_group)
+# 增加规则时，同步规则分组的告警分组
+# 2023-05-12 弃用
+# def add_rule_group(group, rule):
+#     alert_group = RuleGroupTAlertGroup.objects.filter(rule_group_id=group).values('alert_group')
+#     add_group = []
+#     for i in alert_group:
+#         add_group.append(RulesTAlertGroup(rule_id=rule, alert_group_id=i['alert_group']))
+#     if len(add_group) > 0:
+#         RulesTAlertGroup.objects.bulk_create(add_group)
 
 
 class RulesViewSet(viewsets.ModelViewSet):
@@ -177,10 +183,12 @@ class RulesViewSet(viewsets.ModelViewSet):
     filter_class = RulesFilter
     pagination_class = StandardResultsSetPagination
 
-    def perform_create(self, serializer):
-        s = serializer.save()
-        rule_group = s.group.id
-        add_rule_group(group=rule_group, rule=s.id)
+# 2023-05-12 弃用
+# 增加规则时，同步规则分组的告警分组
+    # def perform_create(self, serializer):
+    #     s = serializer.save()
+    #     rule_group = s.group.id
+    #     add_rule_group(group=rule_group, rule=s.id)
 
     def perform_update(self, serializer):
         s = serializer.save()
@@ -204,20 +212,23 @@ class RulesViewSet(viewsets.ModelViewSet):
         instance.delete()
 
 
-class RulesTAlertGroupFilter(django_filters.rest_framework.FilterSet):
-    class Meta:
-        model = RulesTAlertGroup
-        fields = "__all__"
+# 2023-05-12 弃用
+# class RulesTAlertGroupFilter(django_filters.rest_framework.FilterSet):
+#     class Meta:
+#         model = RulesTAlertGroup
+#         fields = "__all__"
+#
 
-
-class RulesTAlertGroupViewSet(BulkModelViewSet):
-    authentication_classes = (SessionAuthentication,)
-    permission_classes = (AllowAny,)
-    queryset = RulesTAlertGroup.objects.all().order_by('-id')
-    serializer_class = RulesTAlertGroupSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filter_class = RulesTAlertGroupFilter
-    pagination_class = StandardResultsSetPagination
+# 2023-05-12 弃用
+# class RulesTAlertGroupViewSet(BulkModelViewSet):
+#     authentication_classes = (SessionAuthentication,)
+#     permission_classes = (AllowAny,)
+#     queryset = RulesTAlertGroup.objects.all().order_by('-id')
+#     serializer_class = RulesTAlertGroupSerializer
+#     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+#     filter_class = RulesTAlertGroupFilter
+#     pagination_class = StandardResultsSetPagination
+#
 
 
 class RulesTAlertUsersFilter(django_filters.rest_framework.FilterSet):
@@ -262,7 +273,7 @@ class RuleGroupAdd(APIView):
             new_alert_group = []
             for group in data['alert_groups']:
                 new_alert_group.append(RuleGroupTAlertGroup(alert_group_id=group, rule_group_id=new_rule_group.id))
-                add_rules_group(rule_group=new_rule_group.id, alert_group=group)
+                # add_rules_group(rule_group=new_rule_group.id, alert_group=group)
             if len(new_alert_group) > 0:
                 RuleGroupTAlertGroup.objects.bulk_create(new_alert_group)
             result['code'] = 0
@@ -286,12 +297,12 @@ class RuleGroupAdd(APIView):
                 print(new_alert_group)
                 for g in new_alert_group:
                     add_alert_group.append(RuleGroupTAlertGroup(alert_group_id=g, rule_group_id=rule_group_id))
-                    add_rules_group(rule_group=rule_group_id, alert_group=g)
+                    # add_rules_group(rule_group=rule_group_id, alert_group=g)
                 RuleGroupTAlertGroup.objects.bulk_create(add_alert_group)
             if len(delete_alert_group) > 0:
                 RuleGroupTAlertGroup.objects.filter(rule_group_id=rule_group_id, alert_group_id__in=delete_alert_group).delete()
-                for g in delete_alert_group:
-                    delete_rules_group(rule_group=rule_group_id, alert_group=g)
+                # for g in delete_alert_group:
+                    # delete_rules_group(rule_group=rule_group_id, alert_group=g)
             result['code'] = 0
         except Exception as e:
             logging.error("[+] update user group failed:%s" % e)

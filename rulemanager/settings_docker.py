@@ -14,7 +14,7 @@ DATABASES = {
        'POOL_OPTIONS': {
             'POOL_SIZE': 10,
             'MAX_OVERFLOW': -1,
-            'RECYCLE': 86400
+            'RECYCLE': 28800
         }
     }
 }

@@ -12,12 +12,13 @@ from rulemanager.alert.tools import alert_channel
 
 
 # 存到redis里？快速查询，在新建用户和用户组时，更新redis数据
-# 这里根据用户名和用户分组从redis 获取数据
-# 每次启动自动更新redis 数据
+# 这里根据用户名和用户分组从 redis 获取数据
+# 每次启动自动更新 redis 数据
 def get_rule_user(rule):
     alter_user = []
-    # 告警对应的告警接受人组
-    b = RulesTAlertGroup.objects.filter(rule=rule)
+    # 规则对应的告警接收分组
+    # b = RulesTAlertGroup.objects.filter(rule=rule)
+    b = RuleGroupTAlertGroup.objects.filter(rule_group=rule.group)
     alter_user.extend([i['user'] for i in
                        AlertGroupTUsers.objects.filter(group__pk__in=[i.alert_group.pk for i in b]).values(
                            'user').distinct()])
